@@ -19,13 +19,16 @@ app.use(cors(corsOptions)); // הגדרת ה-CORS לפני כל שימוש אח�
 
 
 // קישור למסד נתונים
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Ee-2024!",
-  database: "my_shop", // שים לב לוודא שהשם נכון
-});
+const dbUrl = process.env.DATABASE_URL;
 
+const db = dbUrl
+  ? mysql.createConnection(dbUrl) // אם יש DATABASE_URL
+  : mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "Ee-2024!",
+      database: "my_shop",
+    });
 // חיבור למסד נתונים
 db.connect((err) => {
   if (err) {
@@ -35,8 +38,6 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const dbUrl = process.env.DATABASE_URL;
-console.log("Database URL:", dbUrl);
 
 
 // הגדרת Multer לשמירת תמונות בתיקייה
