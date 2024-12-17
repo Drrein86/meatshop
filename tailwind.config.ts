@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        varela: ['"Varela Round"', 'sans-serif'], // הגדרת פונט Varela Round
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
