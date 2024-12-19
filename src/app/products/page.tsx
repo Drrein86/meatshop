@@ -102,7 +102,12 @@ const OrderPage = () => {
                 <CldImage
                   src={product.image || "/6.png"} // תמונה ברירת מחדל אם אין תמונה
                   alt={product.name}
-                  className="w-full h-48 object-cover rounded mb-4"
+                  width="500"
+                  height="500"
+                  crop={{
+                    type: "auto",
+                    source: true,
+                  }}
                 />
                 <h3 className="font-bold text-lg">{product.name}</h3>
                 <p className="text-sm text-gray-600 mb-4">
