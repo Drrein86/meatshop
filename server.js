@@ -58,12 +58,13 @@ app.use("/upload", express.static(path.join(__dirname, "upload")));
 app.use(bodyParser.json());
 
 
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="dajteimpn";
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 if (!cloudName) {
   console.error("Cloudinary Cloud Name is not set");
 } else {
   console.log(`Cloudinary Cloud Name: ${cloudName}`);
 }
+
 
 
 // מסלול להעלאת תמונה
