@@ -2,7 +2,6 @@ const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const multer = require("multer");
 const path = require("path");
 const cloudinary = require('cloudinary').v2;
 
@@ -47,34 +46,26 @@ cloudinary.config({
 });
 
 
-// הגדרת Multer לשמירת תמונות בתיקייה
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "upload"); // תקייה לשמירת התמונות
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + path.extname(file.originalname);
-    cb(null, file.fieldname + "-" + uniqueSuffix); // שם קובץ ייחודי
-  },
-});
-const upload = multer({ storage: storage });
 
 // העלאת תמונה ל-Cloudinary
-app.post('/upload', upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+app.post("/upload", (req, res) => {
+  const { image } = req.body; // קבל את הקובץ שנשלח ב-Base64 או לינק לנתיב
+  if (!image) {
+    return res.status(400).json({ message: "No image provided" });
   }
 
-  cloudinary.uploader.upload(req.file.path, (error, result) => {
+  // העלאת התמונה ל-Cloudinary
+  cloudinary.uploader.upload(image, (error, result) => {
     if (error) {
-      console.error("Error uploading image to Cloudinary:", error);
-      return res.status(500).json({ message: "Error uploading image", error });
+      console.error("Error uploading to Cloudinary:", error);
+      return res.status(500).json({ message: "Error uploading to Cloudinary" });
     }
-  
-    console.log("Uploaded image URL:", result.secure_url); // לוג לכתובת התמונה
+
+    console.log("Uploaded image URL:", result.secure_url);
     res.status(200).json({ imageUrl: result.secure_url });
   });
 });
+
 
 // הגדרת middleware לקריאת נתונים ב-JSON
 app.use(bodyParser.json());
