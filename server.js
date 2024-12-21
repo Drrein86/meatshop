@@ -1,10 +1,11 @@
 const express = require("express");
+require('dotenv').config();
+
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const cloudinary = require('cloudinary').v2;
-require('dotenv').config();
 
 const app = express();
 const port = 3001;
@@ -15,6 +16,11 @@ const corsOptions = {
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
+console.log("Cloudinary Config:", {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(cors()); // הגדרת ה-CORS לפני כל שימוש אחר ב-app
 
@@ -38,22 +44,28 @@ db.connect((err) => {
   }
   console.log("Connected to MySQL database");
 });
-
-
+// טוען את ההגדרות מהסביבה
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // שם ענן של Cloudinary
-  api_key: process.env.CLOUDINARY_API_KEY,       // מפתח API שלך
-  api_secret: process.env.CLOUDINARY_API_SECRET  // סוד API שלך
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+
+
+
 
 
 
 // העלאת תמונה ל-Cloudinary
 app.post("/upload", (req, res) => {
-  const { image } = req.body; // קבל את הקובץ שנשלח ב-Base64 או לינק לנתיב
+  const { image } = req.body; // קבלת התמונה מבקשה (Base64 או URL ישיר)
+  
   if (!image) {
     return res.status(400).json({ message: "No image provided" });
   }
+// הגדרת middleware לקריאת נתונים ב-JSON
+app.use(bodyParser.json());
 
   // העלאת התמונה ל-Cloudinary
   cloudinary.uploader.upload(image, (error, result) => {
@@ -68,11 +80,11 @@ app.post("/upload", (req, res) => {
 });
 
 
-// הגדרת middleware לקריאת נתונים ב-JSON
-app.use(bodyParser.json());
 
 
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 if (!cloudName) {
   console.error("Cloudinary Cloud Name is not set");
 } else {
@@ -81,59 +93,53 @@ if (!cloudName) {
 
 
 
-// מסלול להעלאת תמונה
-app.post("/upload", upload.single("image"), (req, res) => {
-  console.log("Request body:", req.body);
-  console.log("Request file:", req.file);
 
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
-  const filePath = path.join('upload', req.file.filename);
+app.post("/admin/products", (req, res) => {
+  const { image, name, description, price, stock, category, discount } = req.body;
 
-  const imageUrl =`http://localhost:${port}/upload/${req.file.filename}`;
-  console.log("image uploaded to:",imageUrl);
-  res.status(200).json({ imageUrl });
-
-});
-
-// העלאת מוצר חדש
-app.post("/admin/products", upload.single("image"), (req, res) => {
-  console.log("Request body:", req.body); // הדפסה של גוף הבקשה
-
-  console.log("File received:", req.file);  // הדפסת מידע על הקובץ שהתקבל
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
-  const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `http://localhost:${port}/upload/${req.file.filename}` : null;
-
-  console.log("Image URL:", image); // הדפסה לקונסול של כתובת התמונה
-
-
-  if (!name || !price || stock === undefined) {
-    return res.status(400).json({ message: "Please provide all required fields" });
+  if (!image) {
+    return res.status(400).json({ message: "No image provided" });
   }
 
-  const query =
-    "INSERT INTO Products (name, description, price, image, stock, discount, category) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  const values = [
-    name,
-    description || "",
-    price,
-    image,
-    stock,
-    discount || 0.00,  // אם לא סופקה הנחה, ישתמש בברירת מחדל 0.00
-    category || "",  // אם לא סופקה קטגוריה, תשאיר null או ערך ברירת מחדל
-  ];
-
-  db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to add product", error: err });
+  // העלאת התמונה ל-Cloudinary
+  cloudinary.uploader.upload(image, (error, result) => {
+    if (error) {
+      console.error("Error uploading to Cloudinary:", error);
+      return res.status(500).json({ message: "Error uploading to Cloudinary" });
     }
-    res.status(200).json({ message: "Product added successfully", productId: result.insertId });
+
+    const imageUrl = result.secure_url;
+    console.log("Uploaded image URL:", imageUrl);
+
+    if (!name || !price || stock === undefined) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+
+    // הגדרת השאילתה
+    const query = "INSERT INTO Products (name, description, price, image, stock, discount, category) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const values = [
+      name,
+      description || "",
+      price,
+      imageUrl,
+      stock,
+      discount || 0.00,  // אם לא סופקה הנחה, ישתמש בברירת מחדל 0.00
+      category || "",  // אם לא סופקה קטגוריה, תשאיר null או ערך ברירת מחדל
+    ];
+
+    // שליחת השאילתה למסד הנתונים
+    db.query(query, values, (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to add product", error: err });
+      }
+      res.status(200).json({ message: "Product added successfully", productId: result.insertId });
+    });
   });
 });
+
+
+ 
+
 
 
 // עריכת מוצר
