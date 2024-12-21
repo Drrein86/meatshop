@@ -67,12 +67,12 @@ app.post('/upload', upload.single('image'), (req, res) => {
 
   cloudinary.uploader.upload(req.file.path, (error, result) => {
     if (error) {
+      console.error("Error uploading image to Cloudinary:", error);
       return res.status(500).json({ message: "Error uploading image", error });
     }
-
-    // כתובת התמונה לאחר ההעלאה
-    const imageUrl = result.secure_url;
-    res.status(200).json({ imageUrl });
+  
+    console.log("Uploaded image URL:", result.secure_url); // לוג לכתובת התמונה
+    res.status(200).json({ imageUrl: result.secure_url });
   });
 });
 
