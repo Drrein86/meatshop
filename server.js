@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
 const app = express();
 const port = 3001;
