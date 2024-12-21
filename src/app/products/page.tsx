@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../components/CartContext";
 import Link from "next/link";
-import { CldImage } from "next-cloudinary";
+
 // הגדרת טיפוס למוצר
 interface Product {
   id: number;
@@ -99,15 +99,10 @@ const OrderPage = () => {
                 href={`/products/${product.id}`}
               >
                 {/* תמונה של המוצר */}
-                <CldImage
+                <img
                   src={product.image || "/6.png"} // תמונה ברירת מחדל אם אין תמונה
                   alt={product.name}
-                  width="500"
-                  height="500"
-                  crop={{
-                    type: "auto",
-                    source: true,
-                  }}
+                  className="w-full h-48 object-cover rounded mb-4"
                 />
                 <h3 className="font-bold text-lg">{product.name}</h3>
                 <p className="text-sm text-gray-600 mb-4">

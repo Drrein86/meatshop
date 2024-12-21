@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const port = 3001;
@@ -15,7 +16,7 @@ const corsOptions = {
   allowedHeaders: 'Content-Type, Authorization',
 };
 
-app.use(cors(corsOptions)); // הגדרת ה-CORS לפני כל שימוש אחר ב-app
+app.use(cors()); // הגדרת ה-CORS לפני כל שימוש אחר ב-app
 
 
 // קישור למסד נתונים
@@ -39,6 +40,12 @@ db.connect((err) => {
 });
 
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // שם ענן של Cloudinary
+  api_key: process.env.CLOUDINARY_API_KEY,       // מפתח API שלך
+  api_secret: process.env.CLOUDINARY_API_SECRET  // סוד API שלך
+});
+
 
 // הגדרת Multer לשמירת תמונות בתיקייה
 const storage = multer.diskStorage({
@@ -52,7 +59,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-app.use("/upload", express.static(path.join(__dirname, "upload")));
+// העלאת תמונה ל-Cloudinary
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  cloudinary.uploader.upload(req.file.path, (error, result) => {
+    if (error) {
+      return res.status(500).json({ message: "Error uploading image", error });
+    }
+
+    // כתובת התמונה לאחר ההעלאה
+    const imageUrl = result.secure_url;
+    res.status(200).json({ imageUrl });
+  });
+});
 
 // הגדרת middleware לקריאת נתונים ב-JSON
 app.use(bodyParser.json());
