@@ -27,11 +27,14 @@ function Header() {
   const openCart = () => {
     setIsCartOpen((prev) => !prev); // משנה את הסטטוס למצב ההפוך
   };
+  console.log("HamburgerMenu rendered");
 
   return (
     <header dir="rtl">
       <div className="bg-[#093028] h-5"></div>
       <div className="bg-white text-[#093028]">
+        {/* תפריט נפתח לנייד */}
+        <HamburgerMenu />
         <div className="container mx-auto flex flex-wrap items-center justify-between py-4 px-4">
           {/* לוגו */}
           <div className="flex items-center p-2 gap-2">
@@ -112,9 +115,6 @@ function Header() {
             {/* הצגת פופאפ עגלה */}
             {isCartOpen && <CartPopup />}
           </div>
-
-          {/* תפריט נפתח לנייד */}
-          <HamburgerMenu />
         </div>
       </div>
     </header>

@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FaStar } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const TestimonialsCarousel = () => {
   const reviews = [
@@ -26,50 +27,61 @@ const TestimonialsCarousel = () => {
     },
   ];
 
-  const [currentReviews, setCurrentReviews] = useState(reviews);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentReviews((prevReviews) => {
-        const updatedReviews = [...prevReviews];
-        const removedReview = updatedReviews.pop();
-        if (removedReview) {
-          updatedReviews.unshift(removedReview);
-        }
-        return updatedReviews;
-      });
-    }, 2000); // מעבר כל 2 שניות
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % reviews.length);
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? reviews.length - 1 : prevIndex - 1
+    );
+  };
 
   return (
-    <div className="relative w-full overflow-hidden  py-12">
+    <div className="relative w-full max-w-lg mx-auto py-12">
       <h2 className="text-center text-white text-4xl font-bold mb-10">
         מה הלקוחות שלנו אומרים
       </h2>
-      <div className="flex justify-center items-center">
-        <div
-          className="flex transition-transform duration-500"
-          style={{ transform: `translateX(0)` }}
+      <div className="relative flex items-center">
+        {/* כפתור שמאלה */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-0 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700 focus:outline-none"
         >
-          {currentReviews.map((review, index) => (
-            <div
-              key={index}
-              className="w-full min-w-[300px] max-w-[300px] bg-white opacity-85 rounded-lg shadow-lg p-6 mx-4 flex flex-col items-center text-center"
-            >
-              <div className="flex mb-4">
-                {Array(5)
-                  .fill(0)
-                  .map((_, starIndex) => (
-                    <FaStar key={starIndex} className="text-yellow-500" />
-                  ))}
-              </div>
-              <p className="text-gray-700 italic mb-4">"{review.feedback}"</p>
-              <h4 className="text-gray-900 font-semibold">{review.name}</h4>
+          <FaChevronLeft size={20} />
+        </button>
+
+        {/* כרטיס */}
+        <div className="w-full flex justify-center items-center overflow-hidden">
+          <div
+            className="w-full min-w-[300px] max-w-[300px] bg-white opacity-85 rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition-transform duration-500"
+            style={{ transform: `translateX(0)` }}
+          >
+            <div className="flex mb-4">
+              {Array(5)
+                .fill(0)
+                .map((_, starIndex) => (
+                  <FaStar key={starIndex} className="text-yellow-500" />
+                ))}
             </div>
-          ))}
+            <p className="text-gray-700 italic mb-4">
+              "{reviews[currentIndex].feedback}"
+            </p>
+            <h4 className="text-gray-900 font-semibold">
+              {reviews[currentIndex].name}
+            </h4>
+          </div>
         </div>
+
+        {/* כפתור ימינה */}
+        <button
+          onClick={handleNext}
+          className="absolute right-0 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700 focus:outline-none"
+        >
+          <FaChevronRight size={20} />
+        </button>
       </div>
     </div>
   );

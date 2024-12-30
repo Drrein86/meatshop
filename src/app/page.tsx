@@ -25,6 +25,7 @@ const Home = () => {
       {/* סרגל עליון */}
 
       <section className="relative bg-cover bg-center h-[500px] transition-all duration-1000 ease-in-out">
+        <HamburgerMenu />
         {/* תמונות מתחלפות */}
         {images.map((image, index) => (
           <div
@@ -40,14 +41,14 @@ const Home = () => {
 
         {/* שכבת טקסט */}
         <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <div className="text-center text-white px-4 md:px-0">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">
               המקום של קצץ
             </h1>
-            <p className="text-lg md:text-xl mb-6">רשת קצביות בוטיק מובילות</p>
+            <p className="text-sm md:text-xl mb-6">רשת קצביות בוטיק מובילות</p>
             <a
               href="/order"
-              className="bg-[#cc9621] text-white px-6 py-3 rounded hover:bg-[#fdaf33]"
+              className="bg-[#cc9621] text-white px-4 py-2 md:px-6 md:py-3 rounded hover:bg-[#fdaf33] text-sm md:text-base"
             >
               התחילו הזמנה עכשיו
             </a>
@@ -88,7 +89,7 @@ const Home = () => {
                 alt={item.title}
                 width={400}
                 height={250}
-                className="w-full h-56 object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-48 object-cover transition-transform duration-1000 group-hover:scale-110"
               />
             </div>
 
@@ -98,12 +99,12 @@ const Home = () => {
             </div>
 
             {/* טקסט */}
-            <div className="p-6 text-center">
-              <h3 className="text-2xl font-bold mb-4 group-hover:text-[#cc9621] transition duration-300">
+            <div className="p-4 md:p-6 text-center">
+              <h3 className="text-lg md:text-2xl font-bold mb-4 group-hover:text-[#cc9621] transition duration-300">
                 {item.title}
               </h3>
-              <p className="mb-4">{item.description}</p>
-              <button className="px-6 py-3 rounded bg-[#cc9621] text-white hover:bg-[#ff6f00] transition duration-300">
+              <p className="text-sm md:text-base mb-4">{item.description}</p>
+              <button className="px-4 py-2 md:px-6 md:py-3 rounded bg-[#cc9621] text-white hover:bg-[#ff6f00] transition duration-300 text-sm md:text-base">
                 קרא עוד
               </button>
             </div>
@@ -121,19 +122,16 @@ const Home = () => {
         }}
       >
         <div className="absolute inset-0 bg-[#093028] bg-opacity-75 flex items-center justify-center">
-          <div className="text-center flex gap-5 flex-col text-white">
-            <div className="flex flex-col justify-center items-center  p-2 gap-3 ">
-              <GiMeatCleaver
-                size={25}
-                className="text-
-              [#cc9621]"
-              />
-              <span className=" text-[#cc9621] text-xl font-semibold">
-                {" "}
+          <div className="text-center flex flex-col gap-5 text-white px-4">
+            {/* תיקון פריסה רספונסיבית */}
+            <div className="flex flex-col justify-center items-center p-2 gap-3">
+              <GiMeatCleaver size={25} className="text-[#cc9621]" />
+              <span className="text-[#cc9621] text-xl font-semibold">
                 המקום של קצץ
               </span>
-            </div>{" "}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-20">
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 sm:gap-10">
+              {/* שינוי פריסה למכשירים קטנים */}
               {[
                 { number: "1", description: "סניפים" },
                 { number: "3", description: "קצבים" },
@@ -142,11 +140,12 @@ const Home = () => {
                 { number: "2100", description: "לקוחות" },
               ].map((stat, index) => (
                 <div key={index} className="text-white">
-                  <div className="flex flex-col items-center justify-center rounded-full w-32 h-32 bg-white bg-opacity-30 text-[#cc9621] text-xl font-semibold">
+                  <div className="flex flex-col items-center justify-center rounded-full w-24 h-24 md:w-32 md:h-32 bg-white bg-opacity-30 text-[#cc9621] text-lg md:text-xl font-semibold">
                     {stat.number}
-                    <p className="text-white ">{stat.description}</p>
-                  </div>{" "}
-                  {/* מלל תחת המספר */}
+                    <p className="text-white text-sm md:text-base">
+                      {stat.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
