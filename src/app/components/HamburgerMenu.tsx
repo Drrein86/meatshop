@@ -33,6 +33,9 @@ function HamburgerMenu() {
           <a href="/about" className="hover:text-[#093028]">
             אודות
           </a>
+          <a href="/products" className="hover:text-[#093028]">
+            הזמנת משלוחים
+          </a>
           <a href="/contact" className="hover:text-[#093028]">
             צור קשר
           </a>
