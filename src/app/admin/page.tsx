@@ -19,67 +19,53 @@ const AdminPage = () => {
   };
 
   const handleAddProduct = async () => {
-    const formData = new FormData();
-    formData.append("name", productName);
-    formData.append("description", productDescription);
-    formData.append("price", String(productPrice));
-    formData.append("stock", String(productStock));
-    formData.append("category", productCategory);
-    formData.append("discount", String(productDiscount));
-
     try {
       let imageUrl = "";
 
-      // אם יש תמונה, שלח אותה לשרת
+      // אם יש תמונה, העלה אותה ל-Cloudinary
       if (productImage) {
-        formData.append("image", productImage); // הוספת התמונה ל-FormData
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append("file", productImage);
+        cloudinaryFormData.append("upload_preset", "ml_default"); // עדכן ל-upload preset שלך
+        cloudinaryFormData.append("folder", "products"); // תיקייה ב-Cloudinary
 
-        // שליחת תמונה לשרת
         const uploadResponse = await axios.post(
-          "http://localhost:3001/upload", // הכתובת של מסלול העלאת התמונה
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data", // הגדרת Content-Type כ-multipart/form-data
-            },
-          }
+          "https://api.cloudinary.com/v1_1/dajteimpn/image/upload", // URL של Cloudinary
+          cloudinaryFormData
         );
 
-        // אם התמונה הועלתה בהצלחה, שמור את ה-URL שלה
-        if (uploadResponse.status === 200 && uploadResponse.data.imageUrl) {
-          imageUrl = uploadResponse.data.imageUrl; // URL של התמונה מהשרת
-          console.log("Image URL:", imageUrl);
+        // שמירת ה-URL של התמונה
+        if (uploadResponse.status === 200 && uploadResponse.data.secure_url) {
+          imageUrl = uploadResponse.data.secure_url; // URL מאובטח של התמונה
         } else {
           throw new Error("Image upload failed");
         }
       }
 
-      // שליחת הנתונים לשרת לאחר ההעלאה
-      const productData = new FormData();
-      productData.append("name", productName);
-      productData.append("description", productDescription);
-      productData.append("price", String(productPrice));
-      productData.append("stock", String(productStock));
-      productData.append("category", productCategory);
-      productData.append("discount", String(productDiscount));
-      if (productImage) {
-        productData.append("image", productImage); // הוספת URL של התמונה (לא את התמונה עצמה)
-      }
-      console.log("Form Data being sent:", formData); // הוספת הדפסת תוכן ה-formData
+      // שליחת המוצר לשרת המקומי
+      const productData = {
+        name: productName,
+        description: productDescription,
+        price: productPrice,
+        stock: productStock,
+        category: productCategory,
+        discount: productDiscount,
+        image: imageUrl, // ה-URL של התמונה שהועלתה
+      };
 
       const response = await axios.post(
-        "http://localhost:3001/admin/products", // שליחה של המוצר
+        "http://localhost:3001/admin/products", // עדכן את ה-URL לשרת שלך
         productData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // גם פה, המידע מועבר ב-multipart
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (response.status === 200) {
         alert("המוצר נוסף בהצלחה!");
-        // איפוס השדות לאחר הוספה מוצלחת
+        // איפוס השדות
         setProductName("");
         setProductDescription("");
         setProductPrice(0);
@@ -93,7 +79,7 @@ const AdminPage = () => {
     } catch (error) {
       console.error("Error adding product:", error);
       alert(
-        "שגיאה לא ידועה: " +
+        "שגיאה: " +
           (error instanceof Error ? error.message : "לא ניתן לקרוא את השגיאה")
       );
     }
@@ -144,14 +130,14 @@ const AdminPage = () => {
             onChange={(e) => setProductCategory(e.target.value)}
             className="w-full border p-2 rounded"
           >
-            <option value="">בחר קטגוריה</option> {/* ערך ברירת מחדל */}
+            <option value="">בחר קטגוריה</option>
             <option value="בקר">בקר</option>
-            <option value="עוף">טלה</option>
-            <option value="הודו">עופות</option>
-            <option value="הודו">אווז</option>
-            <option value="הודו">על האש</option>
-            <option value="הודו">בישול</option>
-            <option value="הודו">טחונים</option>
+            <option value="טלה">טלה</option>
+            <option value="עופות">עופות</option>
+            <option value="אווז">אווז</option>
+            <option value="על האש">על האש</option>
+            <option value="בישול">בישול</option>
+            <option value="טחונים">טחונים</option>
           </select>
         </div>
         <div>
