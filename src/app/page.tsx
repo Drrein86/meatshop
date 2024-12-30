@@ -25,7 +25,6 @@ const Home = () => {
       {/* סרגל עליון */}
 
       <section className="relative bg-cover bg-center h-[500px] transition-all duration-1000 ease-in-out">
-        <HamburgerMenu />
         {/* תמונות מתחלפות */}
         {images.map((image, index) => (
           <div
