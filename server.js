@@ -10,7 +10,7 @@ const port = 3001;
 
 // הגדרת CORS עם מקור ספציפי - "http://localhost:3000"
 const corsOptions = {
-  origin: 'http://localhost:3000', // רק מקורות מהכתובת הזו יוכלו לגשת
+  origin: 'https://localhost:3000', // רק מקורות מהכתובת הזו יוכלו לגשת
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
@@ -75,7 +75,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   }
   const filePath = path.join('public/upload', req.file.filename);
 
-  const imageUrl =`http://localhost:${port}/upload/${req.file.filename}`;
+  const imageUrl =`https://localhost:${port}/upload/${req.file.filename}`;
   console.log("image uploaded to:",imageUrl);
   res.status(200).json({ imageUrl });
 
@@ -90,7 +90,7 @@ app.post("/admin/products", upload.single("image"), (req, res) => {
     return res.status(400).json({ message: "No file uploaded" });
   }
   const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `http://localhost:${port}/upload/${req.file.filename}` : null;
+  const image = req.file ? `https://localhost:${port}/upload/${req.file.filename}` : null;
 
   console.log("Image URL:", image); // הדפסה לקונסול של כתובת התמונה
 
@@ -220,5 +220,5 @@ app.post("/api/orders", (req, res) => {
 
 // הפעלת השרת
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on https://localhost:${port}`);
 });
