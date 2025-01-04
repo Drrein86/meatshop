@@ -15,10 +15,7 @@ const corsOptions = {
   allowedHeaders: 'Content-Type, Authorization',
 };
 
-
-const cors = require('cors');
-app.use(cors({ origin: 'https://kezez-place.com' }));
- // הגדרת ה-CORS לפני כל שימוש אחר ב-app
+app.use(cors()); // הגדרת ה-CORS לפני כל שימוש אחר ב-app
 // חשיפת תיקיית upload כסטטית
 app.use('/upload', express.static(path.join(__dirname, 'public/upload')));
 
