@@ -43,7 +43,19 @@ db.connect((err) => {
 });
 
 
+const https = require('https');
+const fs = require('fs');
 
+// טעינת המפתחות
+const options = {
+  key: fs.readFileSync('path/to/private-key.pem'),
+  cert: fs.readFileSync('path/to/certificate.pem'),
+};
+
+// הפעלת השרת עם HTTPS
+https.createServer(options, app).listen(port, () => {
+  console.log(`Server is running on https://localhost:${port}`);
+});
 
 
 
