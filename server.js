@@ -8,14 +8,15 @@ const path = require("path");
 const app = express();
 const port = 3001;
 
-// הגדרת CORS עם מקור ספציפי - "http://localhost:3000"
 const corsOptions = {
-  origin: 'https://localhost:3000', // רק מקורות מהכתובת הזו יוכלו לגשת
+  origin: [
+    'http://localhost:3000', // פיתוח
+    'https://kezez-place.com' // פרודקשן
+  ],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
-
-app.use(cors()); // הגדרת ה-CORS לפני כל שימוש אחר ב-app
+app.use(cors(corsOptions));
 // חשיפת תיקיית upload כסטטית
 app.use('/upload', express.static(path.join(__dirname, 'public/upload')));
 
@@ -65,21 +66,20 @@ app.use(bodyParser.json());
 
 
 
-// מסלול להעלאת תמונה
-app.post("/upload", upload.single("image"), (req, res) => {
-  console.log("Request body:", req.body);
-  console.log("Request file:", req.file);
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://kezez-place.com'
+  : `http://localhost:${port}`;
 
+app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
-  const filePath = path.join('public/upload', req.file.filename);
 
-  const imageUrl =`https://localhost:${port}/upload/${req.file.filename}`;
-  console.log("image uploaded to:",imageUrl);
+  const imageUrl = `${BASE_URL}/upload/${req.file.filename}`;
+  console.log("Image uploaded to:", imageUrl);
   res.status(200).json({ imageUrl });
-
 });
+
 
 // העלאת מוצר חדש
 app.post("/admin/products", upload.single("image"), (req, res) => {
