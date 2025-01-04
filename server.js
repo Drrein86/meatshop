@@ -17,8 +17,10 @@ const corsOptions = {
   allowedHeaders: 'Content-Type, Authorization',
 };
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
+
 // חשיפת תיקיית upload כסטטית
-app.use('/upload', express.static(path.join(__dirname, 'public/upload')));
+app.use("/upload", express.static(path.join(__dirname, "public/upload"), { maxAge: "1d" }));
 
 // קישור למסד נתונים
 const dbUrl = process.env.DATABASE_URL;
@@ -83,17 +85,11 @@ app.post("/upload", upload.single("image"), (req, res) => {
 
 // העלאת מוצר חדש
 app.post("/admin/products", upload.single("image"), (req, res) => {
-  console.log("Request body:", req.body); // הדפסה של גוף הבקשה
+  console.log("Request body:", req.body);
+  console.log("File received:", req.file);
 
-  console.log("File received:", req.file);  // הדפסת מידע על הקובץ שהתקבל
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
   const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `https://localhost:${port}/upload/${req.file.filename}` : null;
-
-  console.log("Image URL:", image); // הדפסה לקונסול של כתובת התמונה
-
+  const image = req.file ? `${BASE_URL}/upload/${req.file.filename}` : null;
 
   if (!name || !price || stock === undefined) {
     return res.status(400).json({ message: "Please provide all required fields" });
