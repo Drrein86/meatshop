@@ -31,22 +31,14 @@ const OrderPage = () => {
   const { cart, addToCart } = useCart(); // גישה לפונקציות העגלה
 
   useEffect(() => {
-    // זיהוי הכתובת הבסיסית (Base URL) לפי הסביבה
-    const BASE_URL =
-      process.env.NODE_ENV === "production"
-        ? "https://kezez-place.com"
-        : "http://localhost:3001";
-
-    fetch(`${BASE_URL}/products`, {
+    fetch("http://localhost:3001/products", {
       method: "GET", // שיטה GET (לקרוא נתונים)
       headers: {
         "Content-Type": "application/json",
       },
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        console.log(response); // כדי לראות את התגובה
         return response.json();
       })
       .then((data) => {
