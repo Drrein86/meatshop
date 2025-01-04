@@ -10,7 +10,7 @@ const port = 3001;
 
 const corsOptions = {
   origin: [
-    'https://localhost:3000', // פיתוח
+    'http://localhost:3000', // פיתוח
     'https://kezez-place.com' // פרודקשן
   ],
   methods: 'GET,POST,PUT,DELETE',
@@ -70,7 +70,7 @@ app.use(bodyParser.json());
 
 const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://kezez-place.com'
-  : `https://localhost:${port}`;
+  : `http://localhost:${port}`;
 
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
