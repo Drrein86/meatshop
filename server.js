@@ -43,19 +43,7 @@ db.connect((err) => {
 });
 
 
-const https = require('https');
-const fs = require('fs');
 
-// טעינת המפתחות
-const options = {
-  key: fs.readFileSync('path/to/private-key.pem'),
-  cert: fs.readFileSync('path/to/certificate.pem'),
-};
-
-// הפעלת השרת עם HTTPS
-https.createServer(options, app).listen(port, () => {
-  console.log(`Server is running on https://localhost:${port}`);
-});
 
 
 
@@ -82,7 +70,7 @@ app.use(bodyParser.json());
 
 const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://kezez-place.com'
-  : `https://localhost:${port}`;
+  : `http://localhost:${port}`;
 
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
