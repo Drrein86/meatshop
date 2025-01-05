@@ -93,7 +93,7 @@ const OrderPage = () => {
         <div className="w-3/4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <Link
+              <a
                 key={product.id}
                 className="border p-4 rounded shadow-md hover:shadow-lg"
                 href={`/products/${product.id}`}
@@ -132,7 +132,7 @@ const OrderPage = () => {
                 >
                   הוסף לעגלה
                 </button>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
