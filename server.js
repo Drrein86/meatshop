@@ -213,6 +213,7 @@ app.post("/api/orders", (req, res) => {
     });
   });
 });
+console.log("Database URL:", dbUrl);
 
 // הפעלת השרת
 app.listen(port, "0.0.0.0",() => {
