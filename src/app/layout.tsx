@@ -1,9 +1,11 @@
 "use client";
-import { MyProvider } from "../app/context/MyContext"; // ייבוא הקונטקסט
+import { useEffect } from "react";
+import { MyProvider } from "../app/context/MyContext";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "./components/Header";
 import { CartProvider } from "./components/CartContext";
+import eruda from "eruda"; // ייבוא של Eruda
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,6 +22,12 @@ const geistMono = localFont({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      eruda.init(); // אתחול של Eruda רק בסביבת פיתוח
+    }
+  }, []);
+
   return (
     <MyProvider>
       <CartProvider>
