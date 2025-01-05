@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../components/CartContext";
 import Link from "next/link";
+import Image from "next/image";
 
 // הגדרת טיפוס למוצר
 interface Product {
@@ -93,16 +94,19 @@ const OrderPage = () => {
         <div className="w-3/4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <a
+              <Link
                 key={product.id}
                 className="border p-4 rounded shadow-md hover:shadow-lg"
                 href={`/products/${product.id}`}
               >
                 {/* תמונה של המוצר */}
-                <img
+
+                <Image
                   src={product.image || "/upload/6.png"} // תמונה ברירת מחדל אם אין תמונה
                   alt={product.name}
-                  className="w-full h-48 object-cover rounded mb-4"
+                  width={400}
+                  height={250}
+                  className="w-full h-48 object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
                 <h3 className="font-bold text-lg">{product.name}</h3>
                 <p className="text-sm text-gray-600 mb-4">
@@ -132,7 +136,7 @@ const OrderPage = () => {
                 >
                   הוסף לעגלה
                 </button>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
