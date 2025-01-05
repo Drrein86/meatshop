@@ -16,7 +16,7 @@ const corsOptions = {
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
-app.use(cors(corsOptions));
+app.use(cors({ origin: '*' })); // מאפשר גישה מכל מקור
 app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
 
 // חשיפת תיקיית upload כסטטית
