@@ -216,8 +216,9 @@ app.post("/api/orders", (req, res) => {
     });
   });
 });
-console.log("Database URL:", dbUrl);
-
+console.log("Database URL:", process.env.DATABASE_URL);
+console.log("BASE URL:", process.env.BASE_URL);
+console.log("Node Environment:", process.env.NODE_ENV);
 // הפעלת השרת
 app.listen(port, "0.0.0.0",() => {
   console.log(`Server is running on https://localhost:${port}`);
