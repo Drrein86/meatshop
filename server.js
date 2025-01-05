@@ -16,7 +16,7 @@ const corsOptions = {
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
-app.use(cors({ origin: '*' })); // מאפשר גישה מכל מקור
+app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
 
 // חשיפת תיקיית upload כסטטית
@@ -215,6 +215,6 @@ app.post("/api/orders", (req, res) => {
 });
 
 // הפעלת השרת
-app.listen(port, () => {
+app.listen(port, "0.0.0.0",() => {
   console.log(`Server is running on https://localhost:${port}`);
 });
