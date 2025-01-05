@@ -100,7 +100,7 @@ const OrderPage = () => {
               >
                 {/* תמונה של המוצר */}
                 <img
-                  src={product.image || "/6.png"} // תמונה ברירת מחדל אם אין תמונה
+                  src={product.image || "/upload/6.png"} // תמונה ברירת מחדל אם אין תמונה
                   alt={product.name}
                   className="w-full h-48 object-cover rounded mb-4"
                 />
