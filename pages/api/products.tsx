@@ -8,21 +8,38 @@ const dbConfig = {
   database: process.env.DB_NAME || "my_shop",
 };
 
+// יצירת בריכת חיבורים
+const pool = mysql.createPool(dbConfig);
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // טיפול ב-CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.status(200).end(); // סיום בקשות OPTIONS ללא שגיאות
+    return;
+  }
+
   if (req.method === "GET") {
     try {
-      const connection = await mysql.createConnection(dbConfig);
-      const [rows] = await connection.execute("SELECT * FROM products");
-      await connection.end();
+      // שאילתת SELECT לטבלה products
+      const [rows] = await pool.execute("SELECT * FROM products");
+
+      // שליחת הנתונים ללקוח
       res.status(200).json(rows);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to fetch products" });
+    } catch (error: any) {
+      console.error("Error fetching products:", error);
+      res
+        .status(500)
+        .json({ error: "Failed to fetch products", details: error.message });
     }
   } else {
+    // שיטות HTTP שאינן נתמכות
     res.setHeader("Allow", ["GET"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }

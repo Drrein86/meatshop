@@ -15,13 +15,17 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { id } = useParams();
+  const params = useParams();
+
+  const id = params?.id;
 
   useEffect(() => {
-    if (id) {
+    if (id && typeof id === "string") {
       const fetchProduct = async () => {
         try {
-          const response = await fetch(`http://localhost:3001/products/${id}`);
+          const response = await fetch(
+            `https://kezez-place.com/api/products/${id}`
+          );
           const data = await response.json();
           setProduct(data);
         } catch (error) {
@@ -31,6 +35,14 @@ const ProductDetailPage = () => {
       fetchProduct();
     }
   }, [id]);
+
+  if (!id || typeof id !== "string") {
+    return (
+      <div className="text-center text-lg text-gray-500">
+        מזהה המוצר חסר או לא תקין
+      </div>
+    );
+  }
 
   if (!product)
     return <div className="text-center text-lg text-gray-500">טעינה...</div>;

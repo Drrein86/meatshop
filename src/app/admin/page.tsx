@@ -36,7 +36,7 @@ const AdminPage = () => {
 
         // שליחת תמונה לשרת
         const uploadResponse = await axios.post(
-          "http://localhost:3001/upload", // הכתובת של מסלול העלאת התמונה
+          "https://kezez-place.com/api/upload", // הכתובת של מסלול העלאת התמונה
           formData,
           {
             headers: {
