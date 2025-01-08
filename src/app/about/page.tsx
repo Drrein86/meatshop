@@ -162,7 +162,7 @@ const AboutUsPage = () => {
             transition={{ duration: 1, delay: 1.2 }}
           >
             <img
-              src="6.png"
+              src="upload/6.png"
               alt="סטייקים מיושנים"
               className="w-full h-auto rounded-lg shadow-lg object-cover"
             />
