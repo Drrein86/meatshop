@@ -18,7 +18,7 @@ const corsOptions = {
   ],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
-  credentials: true,
+credentials: true,
 };
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
