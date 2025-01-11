@@ -1,7 +1,5 @@
 const mysql = require("mysql2/promise");
-
 require('dotenv').config();
-
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -19,7 +17,7 @@ const corsOptions = {
   ],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type, Authorization',
-credentials: true,
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
@@ -30,23 +28,18 @@ app.use("/upload", express.static(path.join(__dirname, "public/upload"), { maxAg
 // קישור למסד נתונים
 const dbUrl = process.env.DATABASE_URL;
 
-async function connectToDatabase() {
-  try {
-    const db = await mysql.createConnection(process.env.DATABASE_URL);
-    console.log("Connected to MySQL database");
-    return db;
-  } catch (err) {
-    console.error("Error connecting to database:", err);
-  }
-}
+let db;  // יצירת משתנה גלובלי לחיבור
 
 // חיבור למסד נתונים
-connectToDatabase().then(db => {
-  // עכשיו אפשר לבצע פעולות על מסד הנתונים
-  app.listen(port, "0.0.0.0", () => {
-    console.log(`Server is running on https://localhost:${port}`);
-  });
-});
+async function connectToDatabase() {
+  try {
+    db = await mysql.createConnection(process.env.DATABASE_URL);  // יצירת חיבור למסד
+    console.log("Connected to MySQL database");
+  } catch (err) {
+    console.error("Error connecting to database:", err);
+    process.exit(1);  // עצירת השרת אם החיבור נכשל
+  }
+}
 
 // הגדרת Multer לשמירת תמונות בתיקייה
 const storage = multer.diskStorage({
@@ -60,27 +53,19 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
 // הגדרת middleware לקריאת נתונים ב-JSON
 app.use(bodyParser.json());
 
-const BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://kezez-place.com'
-  : `http://localhost:${port}`;
-
-app.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
-
-  const imageUrl = `${BASE_URL}/upload/${req.file.filename}`;
-  console.log("Image uploaded to:", imageUrl);
-  res.status(200).json({ imageUrl });
+// חיבור למסד נתונים
+connectToDatabase().then(() => {
+  // העלאת השרת רק לאחר חיבור למסד
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server is running on https://localhost:${port}`);
+  });
 });
 
-
-// העלאת מוצר חדש
-app.post("/admin/products", upload.single("image"), (req, res) => {
+// פעולה להוספת מוצר
+app.post("/admin/products", upload.single("image"), async (req, res) => {
   console.log("Request body:", req.body);
   console.log("File received:", req.file);
 
@@ -99,37 +84,36 @@ app.post("/admin/products", upload.single("image"), (req, res) => {
     price,
     image,
     stock,
-    discount || 0.00,  // אם לא סופקה הנחה, ישתמש בברירת מחדל 0.00
-    category || "",  // אם לא סופקה קטגוריה, תשאיר null או ערך ברירת מחדל
+    discount || 0.00,
+    category || "",
   ];
 
-  db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to add product", error: err });
-    }
+  try {
+    const [result] = await db.execute(query, values);
     res.status(200).json({ message: "Product added successfully", productId: result.insertId });
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add product", error: err });
+  }
 });
 
-
 // עריכת מוצר
-app.put("/admin/products/:id", (req, res) => {
+app.put("/admin/products/:id", async (req, res) => {
   const { id } = req.params;
   const { name, description, price, category, image_url, discount } = req.body;
 
   const query = "UPDATE products SET name = ?, description = ?, price = ?, category = ?, image_url = ?, discount = ? WHERE id = ?";
   const values = [name, description, price, category, image_url || "", discount || 0.00, id];
 
-  db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to update product" });
-    }
+  try {
+    await db.execute(query, values);
     res.status(200).json({ message: "Product updated successfully" });
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update product" });
+  }
 });
 
 // מחיקת מוצר
-app.delete("/admin/products/:id", (req, res) => {
+app.delete("/admin/products/:id", async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -137,47 +121,44 @@ app.delete("/admin/products/:id", (req, res) => {
   }
 
   const query = "DELETE FROM Products WHERE id = ?";
-  db.query(query, [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to delete product", error: err });
-    }
+  try {
+    await db.execute(query, [id]);
     res.status(200).json({ message: "Product deleted successfully" });
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete product", error: err });
+  }
 });
 
 // הצגת כל המוצרים
-app.get("/api/db", (req, res) => {
+app.get("/api/db", async (req, res) => {
   const query = "SELECT * FROM Products";
-  db.query(query, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to fetch products", error: err });
-    }
+  try {
+    const [results] = await db.execute(query);
     res.status(200).json(results);
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch products", error: err });
+  }
 });
 
 // הצגת מוצר לפי מזהה
-app.get("/products/:id", (req, res) => {
-  const productId = req.params.id; // מקבל את מזהה המוצר מתוך הכתובת
-  const query = "SELECT * FROM Products WHERE id = ?"; // חיפוש המוצר לפי מזהה
+app.get("/products/:id", async (req, res) => {
+  const productId = req.params.id;
+  const query = "SELECT * FROM Products WHERE id = ?";
   
-  db.query(query, [productId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to fetch product", error: err });
-    }
+  try {
+    const [results] = await db.execute(query, [productId]);
     if (results.length > 0) {
-      res.status(200).json(results[0]); // מחזירים את המוצר הספציפי
+      res.status(200).json(results[0]);
     } else {
-      res.status(404).json({ message: "Product not found" }); // אם לא נמצא
+      res.status(404).json({ message: "Product not found" });
     }
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch product", error: err });
+  }
 });
 
-
-
-
 // יצירת הזמנה חדשה
-app.post("/api/orders", (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const { user_id, cart, total_price } = req.body;
 
   if (!user_id || !cart || cart.length === 0) {
@@ -185,12 +166,10 @@ app.post("/api/orders", (req, res) => {
   }
 
   const query = "INSERT INTO Orders (user_id, total_price) VALUES (?, ?)";
-  db.query(query, [user_id, total_price || 0], (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to create order", error: err });
-    }
-
+  try {
+    const [result] = await db.execute(query, [user_id, total_price || 0]);
     const orderId = result.insertId;
+
     const itemsQuery =
       "INSERT INTO Order_Items (order_id, product_id, quantity, price) VALUES ?";
     const itemsValues = cart.map((item) => [
@@ -200,19 +179,13 @@ app.post("/api/orders", (req, res) => {
       item.price,
     ]);
 
-    db.query(itemsQuery, [itemsValues], (err) => {
-      if (err) {
-        return res.status(500).json({ message: "Failed to add order items", error: err });
-      }
-
-      res.status(200).json({ message: "Order placed successfully", orderId });
-    });
-  });
+    await db.query(itemsQuery, [itemsValues]);
+    res.status(200).json({ message: "Order placed successfully", orderId });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create order", error: err });
+  }
 });
+
 console.log("Database URL:", process.env.DATABASE_URL);
 console.log("BASE URL:", process.env.BASE_URL);
 console.log("Node Environment:", process.env.NODE_ENV);
-// הפעלת השרת
-app.listen(port, "0.0.0.0",() => {
-  console.log(`Server is running on https://localhost:${port}`);
-});
