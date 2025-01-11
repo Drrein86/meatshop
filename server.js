@@ -15,12 +15,14 @@ const corsOptions = {
     'http://localhost:3000', // פיתוח
     'https://kezez-place.com' // פרודקשן
   ],
-  methods: 'GET,POST,PUT,DELETE',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // ודא ש-OPTIONS כלול
   allowedHeaders: 'Content-Type, Authorization',
   credentials: true,
 };
-app.use(cors(corsOptions));
+
+app.use(cors(corsOptions)); // אפשר גישה באמצעות CORS לכל הבקשות
 app.options("*", cors(corsOptions)); // טיפול בבקשות OPTIONS
+
 
 // חשיפת תיקיית upload כסטטית
 app.use("/upload", express.static(path.join(__dirname, "public/upload"), { maxAge: "1d" }));
@@ -70,7 +72,7 @@ app.post("/admin/products", upload.single("image"), async (req, res) => {
   console.log("File received:", req.file);
 
   const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `${BASE_URL}/upload/${req.file.filename}` : null;
+  const image = req.file ? `${process.env.BASE_URL}/upload/${req.file.filename}` : null;
 
   if (!name || !price || stock === undefined) {
     return res.status(400).json({ message: "Please provide all required fields" });
