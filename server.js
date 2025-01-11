@@ -1,8 +1,9 @@
+const mysql = require("mysql2/promise");
+
 require('dotenv').config();
 
 
 const express = require("express");
-const mysql = require("mysql2/promise");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
@@ -29,21 +30,23 @@ app.use("/upload", express.static(path.join(__dirname, "public/upload"), { maxAg
 // קישור למסד נתונים
 const dbUrl = process.env.DATABASE_URL;
 
-const db = mysql.createConnection(process.env.DATABASE_URL);
+async function connectToDatabase() {
+  try {
+    const db = await mysql.createConnection(process.env.DATABASE_URL);
+    console.log("Connected to MySQL database");
+    return db;
+  } catch (err) {
+    console.error("Error connecting to database:", err);
+  }
+}
 
 // חיבור למסד נתונים
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to database:", err);
-    return;
-  }
-  console.log("Connected to MySQL database");
+connectToDatabase().then(db => {
+  // עכשיו אפשר לבצע פעולות על מסד הנתונים
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server is running on https://localhost:${port}`);
+  });
 });
-
-
-
-
-
 
 // הגדרת Multer לשמירת תמונות בתיקייה
 const storage = multer.diskStorage({
@@ -60,11 +63,6 @@ const upload = multer({ storage: storage });
 
 // הגדרת middleware לקריאת נתונים ב-JSON
 app.use(bodyParser.json());
-
-
-
-
-
 
 const BASE_URL = process.env.NODE_ENV === 'production'
   ? 'https://kezez-place.com'
