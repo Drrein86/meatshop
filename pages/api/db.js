@@ -13,7 +13,7 @@ connection.connect(err => {
 });
 
 export default function handler(req, res) {
-  connection.query('SELECT * FROM users', (err, results) => {
+  connection.query('SELECT * FROM products', (err, results) => {
     if (err) {
       res.status(500).json({ error: err });
     } else {

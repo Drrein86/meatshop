@@ -32,28 +32,33 @@ const OrderPage = () => {
   const { cart, addToCart } = useCart(); // גישה לפונקציות העגלה
 
   useEffect(() => {
-    fetch("http://localhost:3001/products", {
-      method: "GET", // שיטה GET (לקרוא נתונים)
+    fetch("/api/db", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     })
       .then((response) => {
-        console.log(response); // כדי לראות את התגובה
+        console.log("Response Status:", response.status); // כדי לראות את סטטוס התגובה
         return response.json();
       })
       .then((data) => {
-        console.log(data); // הדפס את המוצרים לבדיקה
-        setProducts(data);
+        console.log("Data Received:", data); // הדפס את הנתונים
+        if (Array.isArray(data)) {
+          setProducts(data); // רק אם הנתונים הם מערך
+        } else {
+          console.error("Invalid data format:", data);
+          setProducts([]); // הגדר ערך ריק כברירת מחדל
+        }
       })
       .catch((error) => console.error("Error loading products:", error));
   }, []);
 
-  // סינון מוצרים לפי קטגוריה
-  const filteredProducts =
-    selectedCategory === "all"
+  const filteredProducts = Array.isArray(products)
+    ? selectedCategory === "all"
       ? products
-      : products.filter((product) => product.category === selectedCategory);
+      : products.filter((product) => product.category === selectedCategory)
+    : [];
 
   // עדכון כמות מוצר ספציפי
   const handleQuantityChange = (productId: number, quantity: number) => {
@@ -93,51 +98,54 @@ const OrderPage = () => {
         {/* הצגת המוצרים */}
         <div className="w-3/4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.id}
-                className="border p-4 rounded shadow-md hover:shadow-lg"
-                href={`/products/${product.id}`}
-              >
-                {/* תמונה של המוצר */}
-
-                <Image
-                  src={product.image || "/upload/6.png"} // תמונה ברירת מחדל אם אין תמונה
-                  alt={product.name}
-                  width={400}
-                  height={250}
-                  className="w-full h-48 object-cover transition-transform duration-1000 group-hover:scale-110"
-                />
-                <h3 className="font-bold text-lg">{product.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {product.description}
-                </p>
-                <p className="text-lg font-semibold">{product.price} ₪</p>
-                <div className="mt-4">
-                  <label htmlFor="quantity" className="block">
-                    כמות:
-                  </label>
-                  <input
-                    type="number"
-                    id="quantity"
-                    value={quantities[product.id] || 1} // מצגת הכמות עבור המוצר הספציפי
-                    min="1"
-                    onChange={(e) =>
-                      handleQuantityChange(product.id, Number(e.target.value))
-                    }
-                    className="w-16 p-2 border border-gray-300 rounded"
-                  />
-                </div>
-                <button
-                  onClick={() =>
-                    addToCart(product.id, quantities[product.id] || 1)
-                  }
-                  className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-full w-full"
+            {Array.isArray(filteredProducts) && filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  className="border p-4 rounded shadow-md hover:shadow-lg"
+                  href={`/products/${product.id}`}
                 >
-                  הוסף לעגלה
-                </button>
-              </Link>
-            ))}
+                  {/* תוכן המוצר */}
+                  <Image
+                    src={product.image || "/upload/6.png"}
+                    alt={product.name}
+                    width={400}
+                    height={250}
+                    className="w-full h-48 object-cover transition-transform duration-1000 group-hover:scale-110"
+                  />
+                  <h3 className="font-bold text-lg">{product.name}</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {product.description}
+                  </p>
+                  <p className="text-lg font-semibold">{product.price} ₪</p>
+                  <div className="mt-4">
+                    <label htmlFor="quantity" className="block">
+                      כמות:
+                    </label>
+                    <input
+                      type="number"
+                      id="quantity"
+                      value={quantities[product.id] || 1}
+                      min="1"
+                      onChange={(e) =>
+                        handleQuantityChange(product.id, Number(e.target.value))
+                      }
+                      className="w-16 p-2 border border-gray-300 rounded"
+                    />
+                  </div>
+                  <button
+                    onClick={() =>
+                      addToCart(product.id, quantities[product.id] || 1)
+                    }
+                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-full w-full"
+                  >
+                    הוסף לעגלה
+                  </button>
+                </Link>
+              ))
+            ) : (
+              <p>אין מוצרים זמינים</p> // טקסט חלופי במקרה שאין מוצרים
+            )}
           </div>
         </div>
       </div>
