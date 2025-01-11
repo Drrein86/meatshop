@@ -32,7 +32,7 @@ const OrderPage = () => {
   const { cart, addToCart } = useCart(); // גישה לפונקציות העגלה
 
   useEffect(() => {
-    fetch("/api/db", {
+    fetch("https://kezez-place.com/api/db", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
