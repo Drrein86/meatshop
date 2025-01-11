@@ -46,7 +46,7 @@ const Home = () => {
             </h1>
             <p className="text-sm md:text-xl mb-6">רשת קצביות בוטיק מובילות</p>
             <a
-              href="/order"
+              href="/products"
               className="bg-[#cc9621] text-white px-4 py-2 md:px-6 md:py-3 rounded hover:bg-[#fdaf33] text-sm md:text-base"
             >
               התחילו הזמנה עכשיו
