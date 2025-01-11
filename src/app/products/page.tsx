@@ -32,7 +32,7 @@ const OrderPage = () => {
   const { cart, addToCart } = useCart(); // גישה לפונקציות העגלה
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/db", {
+    fetch("/api/db", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

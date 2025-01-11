@@ -29,14 +29,8 @@ app.use("/upload", express.static(path.join(__dirname, "public/upload"), { maxAg
 // קישור למסד נתונים
 const dbUrl = process.env.DATABASE_URL;
 
-const db = dbUrl
-  ? mysql.createConnection(dbUrl) // אם יש DATABASE_URL
-  : mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "Ee-2024!",
-      database: "my_shop",
-    });
+const db = mysql.createConnection(process.env.DATABASE_URL);
+
 // חיבור למסד נתונים
 db.connect((err) => {
   if (err) {
