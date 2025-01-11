@@ -40,15 +40,21 @@ const OrderPage = () => {
     })
       .then((response) => {
         console.log("Response Status:", response.status); // כדי לראות את סטטוס התגובה
-        return response.json();
+        return response.text(); // זה ייתן לך את התגובה כטקסט, לא כ-JSON
       })
       .then((data) => {
-        console.log("Data Received:", data); // הדפס את הנתונים
-        if (Array.isArray(data)) {
-          setProducts(data); // רק אם הנתונים הם מערך
-        } else {
-          console.error("Invalid data format:", data);
-          setProducts([]); // הגדר ערך ריק כברירת מחדל
+        console.log("Data Received:", data); // הדפס את התגובה כדי לראות אם זה JSON
+        try {
+          const jsonData = JSON.parse(data); // המרה ל-JSON
+          if (Array.isArray(jsonData)) {
+            setProducts(jsonData); // רק אם הנתונים הם מערך
+          } else {
+            console.error("Invalid data format:", jsonData);
+            setProducts([]); // הגדר ערך ריק כברירת מחדל
+          }
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          setProducts([]); // אם יש שגיאה בהמרת ה-JSON
         }
       })
       .catch((error) => console.error("Error loading products:", error));
