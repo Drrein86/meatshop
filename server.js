@@ -148,7 +148,7 @@ app.delete("/admin/products/:id", (req, res) => {
 });
 
 // הצגת כל המוצרים
-app.get("/products", (req, res) => {
+app.get("/api/db", (req, res) => {
   const query = "SELECT * FROM Products";
   db.query(query, (err, results) => {
     if (err) {
