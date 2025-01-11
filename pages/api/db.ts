@@ -7,6 +7,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10, // הגדרת כמות חיבורים מקסימלית
   queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false, // במידת הצורך
+  },
 });
 
 export default async function handler(
