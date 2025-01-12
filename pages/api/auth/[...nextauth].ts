@@ -1,4 +1,3 @@
-"use client";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -9,11 +8,10 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET, // ודא שהוספת NEXTAUTH_SECRET
   pages: {
-    signIn: '/login',
+    signIn: "/login", // הדף שלך להתחברות
   },
 };
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export default NextAuth(authOptions);
