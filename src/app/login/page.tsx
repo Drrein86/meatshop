@@ -1,10 +1,14 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const { data: session } = useSession();
-
+  useEffect(() => {
+    // אפשר להוסיף כאן לוגיקה שקשורה לטעינה של סשן
+    console.log(session);
+  }, [session]);
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="text-center">
