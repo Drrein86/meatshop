@@ -13,5 +13,6 @@ export const authOptions = {
     signIn: "/login", // הדף שלך להתחברות
   },
 };
+console.log(process.env.GOOGLE_CLIENT_ID);
 
 export default NextAuth(authOptions);
