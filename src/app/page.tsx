@@ -24,7 +24,7 @@ const Home = () => {
     <div dir="rtl" className="bg-white text-gray-800 font-sans">
       {/* סרגל עליון */}
 
-      <section className="relative bg-cover bg-center h-[500px] transition-all duration-1000 ease-in-out">
+      <section className="relative bg-cover bg-center h-[300px] transition-all duration-1000 ease-in-out">
         {/* תמונות מתחלפות */}
         {images.map((image, index) => (
           <div
@@ -44,19 +44,23 @@ const Home = () => {
             <h1 className="text-3xl md:text-5xl font-bold mb-4">
               המקום של קצץ
             </h1>
-            <p className="text-sm md:text-xl mb-6">רשת קצביות בוטיק מובילות</p>
+            <p className="text-sm md:text-xl mb-6">רשת קצביות מובילות</p>
             <a
               href="/products"
-              className="bg-[#cc9621] text-white px-4 py-2 md:px-6 md:py-3 rounded hover:bg-[#fdaf33] text-sm md:text-base"
+              className="bg-[#cc9621] text-white font-semibold px-4 py-2 md:px-6 md:py-3 rounded hover:bg-[#fdaf33] text-sm md:text-base"
             >
-              התחילו הזמנה עכשיו
+              להזמנת משלוח{" "}
             </a>
           </div>
         </div>
       </section>
 
       {/* יתרונות */}
-      <section className="container mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="text-center flex flex-col gap-1 py-3 text-[#093028] px-4 md:px-0">
+        <h1 className="text-xl md:text-3xl font-bold ">בקצביה של קצץ</h1>
+        <p className="text-sm md:text-xl text-[#093028] ">אנחנו פה בשבילכם!</p>
+      </div>
+      <section className="container mx-auto py-6 px-6 grid grid-cols-2 md:grid-cols-3 gap-8">
         {[
           {
             image: "/1.png",
@@ -88,18 +92,18 @@ const Home = () => {
                 alt={item.title}
                 width={400}
                 height={250}
-                className="w-full h-48 object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="w-full h-32 object-cover transition-transform duration-1000 group-hover:scale-110"
               />
             </div>
 
             {/* סמל */}
-            <div className="text-4xl my-4 text-[#cc9621] group-hover:text-[#ff6f00] transition duration-300">
+            <div className="text-4xl my-2 text-[#cc9621] group-hover:text-[#ff6f00] transition duration-300">
               {item.icon}
             </div>
 
             {/* טקסט */}
-            <div className="p-4 md:p-6 text-center">
-              <h3 className="text-lg md:text-2xl font-bold mb-4 group-hover:text-[#cc9621] transition duration-300">
+            <div className="p-2 md:p-4 text-center">
+              <h3 className="text-lg md:text-2xl font-bold mb-2 group-hover:text-[#cc9621] transition duration-300">
                 {item.title}
               </h3>
               <p className="text-sm md:text-base mb-4">{item.description}</p>
