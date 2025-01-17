@@ -101,9 +101,9 @@ function Header() {
 
           {/* אייקונים */}
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm hover:underline">
+            <a href="/login" className="text-sm hover:underline">
               כניסה
-            </Link>
+            </a>
             {/* כפתור לעגלת קניות */}
             <button
               className="bg-blue-500 py-2 px-4 rounded-full"
