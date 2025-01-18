@@ -9,6 +9,7 @@ import {
   FaShoppingCart,
   FaTruck,
   FaUtensils,
+  FaWhatsapp,
 } from "react-icons/fa"; // עגלת קניות
 import { FiMenu } from "react-icons/fi"; // תפריט נפתח
 import { GiMeatCleaver } from "react-icons/gi";
@@ -340,23 +341,10 @@ const Home = () => {
         href="https://wa.me/972501234567"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-4 right-4 bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition"
+        className="fixed bottom-4 right-4 bg-green-500 text-white rounded-full p-2 shadow-lg hover:bg-green-600 transition"
         aria-label="WhatsApp"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M20.2 4.8a10 10 0 11-16.4 11.2L2 22l6.3-1.8A10 10 0 0120.2 4.8z"
-          />
-        </svg>
+        <FaWhatsapp className="h-8 w-8" />
       </a>
     </div>
   );
