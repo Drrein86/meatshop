@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import { CartProvider } from "./components/CartContext";
 import { SessionProvider } from "next-auth/react";
+import { Rubik } from "next/font/google";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,6 +18,10 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+const rubik = Rubik({
+  subsets: ["hebrew", "latin"], // תת-שפות (תמיכה בעברית)
+  weight: ["400", "500", "700"], // משקלים
+});
 
 export default function RootLayout({
   children,
@@ -27,7 +32,7 @@ export default function RootLayout({
         <CartProvider>
           <html lang="en">
             <body
-              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+              className={`${geistSans.variable} ${geistMono.variable} ${rubik.className} antialiased`}
             >
               <Header />
               {children}

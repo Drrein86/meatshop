@@ -30,7 +30,7 @@ function Header() {
   console.log("HamburgerMenu rendered");
 
   return (
-    <header dir="rtl">
+    <header dir="rtl" className="sticky z-50 top-0">
       <div className="bg-[#093028] h-7 flex items-center justify-start p-1 text-white">
         <a href="tel:+1234567890" className="flex items-center  gap-2">
           <svg
