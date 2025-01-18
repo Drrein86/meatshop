@@ -138,7 +138,7 @@ const OrderPage = () => {
                         onClick={() =>
                           addToCart(product.id, quantities[product.id] || 1)
                         }
-                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-full w-full"
+                        className="mt-4 bg-black text-white py-2 px-4 rounded-full w-full"
                       >
                         הוסף לעגלה
                       </button>
