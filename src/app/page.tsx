@@ -1,5 +1,9 @@
 "use client";
 
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,10 +24,8 @@ import TestimonialsCarousel from "./components/TestimonialsCarousel";
 const Home = () => {
   const images = ["/1.png", "/2.png", "/3.png"]; // רשימת התמונות
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const nextCard = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % cards.length);
-  };
+  const [isClient, setIsClient] = useState(false);
+
   const cards = [
     {
       image: "/4.png",
@@ -44,23 +46,23 @@ const Home = () => {
         "עם שנים של ניסיון, אנחנו מביאים מסורת של איכות, טריות ומקצועיות עד אליכם. לכל נתח סיפור, ואנחנו גאים לחלוק אותו אתכם דרך הטעמים המשובחים שלנו.",
     },
   ];
-  const prevCard = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? cards.length - 1 : prevIndex - 1
-    );
-  };
+
   useEffect(() => {
+    setIsClient(true);
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 3000); // התחלפות כל 3 שניות
 
     return () => clearInterval(interval); // ניקוי האינטרוול בזמן הסרת הקומפוננטה
   }, []);
+  if (!isClient) return null; // מחזיר null בזמן שהלקוח טוען את הקוד
+
   return (
     <div dir="rtl" className="bg-white text-gray-800 font-sans">
       {/* סרגל עליון */}
 
-      <section className="relative bg-cover bg-center h-[300px] transition-all duration-1000 ease-in-out">
+      <section className="relative bg-cover bg-center md:h-[500px] h-[300px] transition-all duration-1000 ease-in-out">
         {/* תמונות מתחלפות */}
         {images.map((image, index) => (
           <div
@@ -209,34 +211,35 @@ const Home = () => {
 
           {/* גרסה למכשירים קטנים */}
           <div className="md:hidden relative px-6">
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden  text-center">
-              <img
-                src={cards[currentIndex].image}
-                alt={cards[currentIndex].title}
-                className="w-full h-48 object-cover mb-4"
-              />
-              <h3 className="text-2xl  font-semibold ">
-                {cards[currentIndex].title}
-              </h3>
-              <p className="text-gray-600 p-3">
-                {cards[currentIndex].description}
-              </p>
-            </div>
-            {/* כפתורי ניווט */}
-            <button
-              onClick={prevCard}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2  text-gray-800 rounded-full shadow-lg hover:bg-gray-200 bg-transparent"
+            <Slider
+              dots={true}
+              infinite={true}
+              speed={500}
+              slidesToShow={1}
+              slidesToScroll={1}
+              prevArrow={
+                <FaChevronLeft className="absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-800 rounded-full shadow-lg hover:bg-gray-200 bg-transparent" />
+              }
+              nextArrow={
+                <FaChevronRight className="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-800 rounded-full shadow-lg hover:bg-gray-200 bg-transparent" />
+              }
             >
-              <FaChevronLeft />
-            </button>
-            <button
-              onClick={nextCard}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2  text-gray-800 rounded-full  shadow-lg hover:bg-gray-200 bg-transparent "
-            >
-              <FaChevronRight />
-            </button>
+              {cards.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-white shadow-lg rounded-lg overflow-hidden text-center"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-48 object-cover mb-4"
+                  />
+                  <h3 className="text-2xl font-semibold">{item.title}</h3>
+                  <p className="text-gray-600 p-3">{item.description}</p>
+                </div>
+              ))}
+            </Slider>
           </div>
-
           {/* גרסה למכשירים גדולים */}
           <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
             {cards.map((item, index) => (
