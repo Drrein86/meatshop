@@ -68,7 +68,7 @@ const AdminPage = () => {
       console.log("Form Data being sent:", formData); // הוספת הדפסת תוכן ה-formData
 
       const response = await axios.post(
-        "http://localhost:3001/admin/products", // שליחה של המוצר
+        "https://kezez-place.com/admin/products", // שליחה של המוצר
         productData,
         {
           headers: {
