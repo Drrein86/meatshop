@@ -31,7 +31,7 @@ const OrderPage = () => {
     useState<string>("כל המוצרים");
 
   useEffect(() => {
-    fetch("http://kezez-place.com/api/db", {
+    fetch("https://kezez-place.com/api/db", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
