@@ -17,7 +17,6 @@ const AdminPage = () => {
       setProductImage(e.target.files[0]);
     }
   };
-
   const handleAddProduct = async () => {
     const formData = new FormData();
     formData.append("name", productName);
@@ -27,52 +26,19 @@ const AdminPage = () => {
     formData.append("category", productCategory);
     formData.append("discount", String(productDiscount));
 
+    // אם יש תמונה, הוסף אותה ל-FormData
+    if (productImage) {
+      formData.append("image", productImage);
+    }
+
     try {
-      let imageUrl = "";
-
-      // אם יש תמונה, שלח אותה לשרת
-      if (productImage) {
-        formData.append("image", productImage); // הוספת התמונה ל-FormData
-
-        // שליחת תמונה לשרת
-        const uploadResponse = await axios.post(
-          "https://kezez-place.com/api/db",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data", // הגדרת Content-Type כ-multipart/form-data
-            },
-          }
-        );
-
-        // אם התמונה הועלתה בהצלחה, שמור את ה-URL שלה
-        if (uploadResponse.status === 200 && uploadResponse.data.imageUrl) {
-          imageUrl = uploadResponse.data.imageUrl; // URL של התמונה מהשרת
-          console.log("Image URL:", imageUrl);
-        } else {
-          throw new Error("Image upload failed");
-        }
-      }
-
-      // שליחת הנתונים לשרת לאחר ההעלאה
-      const productData = new FormData();
-      productData.append("name", productName);
-      productData.append("description", productDescription);
-      productData.append("price", String(productPrice));
-      productData.append("stock", String(productStock));
-      productData.append("category", productCategory);
-      productData.append("discount", String(productDiscount));
-      if (productImage) {
-        productData.append("image", productImage); // הוספת URL של התמונה (לא את התמונה עצמה)
-      }
-      console.log("Form Data being sent:", formData); // הוספת הדפסת תוכן ה-formData
-
+      // שלח את כל הנתונים לשרת
       const response = await axios.post(
         "https://kezez-place.com/api/db",
-
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // גם פה, המידע מועבר ב-multipart
+            "Content-Type": "multipart/form-data", // הגדרת Content-Type כ-multipart/form-data
           },
         }
       );
