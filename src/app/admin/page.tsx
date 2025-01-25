@@ -8,8 +8,8 @@ const AdminPage = () => {
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState(0);
   const [productStock, setProductStock] = useState(0);
-  const [productCategory, setProductCategory] = useState("");
-  const [productDiscount, setProductDiscount] = useState(0);
+  const [productCategory, setProductCategory] = useState(""); // קטגוריה
+  const [productDiscount, setProductDiscount] = useState(0); // הנחה
   const [productImage, setProductImage] = useState<File | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,32 +19,67 @@ const AdminPage = () => {
   };
 
   const handleAddProduct = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("name", productName);
-      formData.append("description", productDescription);
-      formData.append("price", String(productPrice));
-      formData.append("stock", String(productStock));
-      formData.append("category", productCategory);
-      formData.append("discount", String(productDiscount));
+    const formData = new FormData();
+    formData.append("name", productName);
+    formData.append("description", productDescription);
+    formData.append("price", String(productPrice));
+    formData.append("stock", String(productStock));
+    formData.append("category", productCategory);
+    formData.append("discount", String(productDiscount));
 
+    try {
+      let imageUrl = "";
+
+      // אם יש תמונה, שלח אותה לשרת
       if (productImage) {
-        formData.append("image", productImage);
+        formData.append("image", productImage); // הוספת התמונה ל-FormData
+
+        // שליחת תמונה לשרת
+        const uploadResponse = await axios.post(
+          "https://kezez-place.com/api/db",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data", // הגדרת Content-Type כ-multipart/form-data
+            },
+          }
+        );
+
+        // אם התמונה הועלתה בהצלחה, שמור את ה-URL שלה
+        if (uploadResponse.status === 200 && uploadResponse.data.imageUrl) {
+          imageUrl = uploadResponse.data.imageUrl; // URL של התמונה מהשרת
+          console.log("Image URL:", imageUrl);
+        } else {
+          throw new Error("Image upload failed");
+        }
       }
 
-      // שליחת הנתונים לשרת
+      // שליחת הנתונים לשרת לאחר ההעלאה
+      const productData = new FormData();
+      productData.append("name", productName);
+      productData.append("description", productDescription);
+      productData.append("price", String(productPrice));
+      productData.append("stock", String(productStock));
+      productData.append("category", productCategory);
+      productData.append("discount", String(productDiscount));
+      if (productImage) {
+        productData.append("image", productImage); // הוספת URL של התמונה (לא את התמונה עצמה)
+      }
+      console.log("Form Data being sent:", formData); // הוספת הדפסת תוכן ה-formData
+
       const response = await axios.post(
-        "https://kezez-place.com/api/admin/products",
-        formData,
+        "https://kezez-place.com/api/db",
+
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", // גם פה, המידע מועבר ב-multipart
           },
         }
       );
 
       if (response.status === 200) {
         alert("המוצר נוסף בהצלחה!");
+        // איפוס השדות לאחר הוספה מוצלחת
         setProductName("");
         setProductDescription("");
         setProductPrice(0);
@@ -58,8 +93,8 @@ const AdminPage = () => {
     } catch (error) {
       console.error("Error adding product:", error);
       alert(
-        "שגיאה במהלך הוספת מוצר: " +
-          (error instanceof Error ? error.message : "שגיאה לא ידועה")
+        "שגיאה לא ידועה: " +
+          (error instanceof Error ? error.message : "לא ניתן לקרוא את השגיאה")
       );
     }
   };
@@ -109,14 +144,14 @@ const AdminPage = () => {
             onChange={(e) => setProductCategory(e.target.value)}
             className="w-full border p-2 rounded"
           >
-            <option value="">בחר קטגוריה</option>
+            <option value="">בחר קטגוריה</option> {/* ערך ברירת מחדל */}
             <option value="בקר">בקר</option>
-            <option value="טלה">טלה</option>
-            <option value="עופות">עופות</option>
-            <option value="אווז">אווז</option>
-            <option value="על האש">על האש</option>
-            <option value="בישול">בישול</option>
-            <option value="טחונים">טחונים</option>
+            <option value="עוף">טלה</option>
+            <option value="הודו">עופות</option>
+            <option value="הודו">אווז</option>
+            <option value="הודו">על האש</option>
+            <option value="הודו">בישול</option>
+            <option value="הודו">טחונים</option>
           </select>
         </div>
         <div>
