@@ -67,12 +67,12 @@ connectToDatabase().then(() => {
 });
 
 // פעולה להוספת מוצר
-app.post("/admin/products", upload.single("image"), async (req, res) => {
+app.post("/api/db", upload.single("image"), async (req, res) => {
   console.log("Request body:", req.body);
   console.log("File received:", req.file);
 
   const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `${process.env.BASE_URL}/upload/${req.file.filename}` : null;
+  const image = req.file ? `${process.env.BASE_URL}/api/db/${req.file.filename}` : null;
 
   if (!name || !price || stock === undefined) {
     return res.status(400).json({ message: "Please provide all required fields" });
