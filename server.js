@@ -53,7 +53,17 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + uniqueSuffix); // שם קובץ ייחודי
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only JPEG, PNG, and GIF are allowed."));
+    }
+  },
+});
 
 // הגדרת middleware לקריאת נתונים ב-JSON
 app.use(bodyParser.json());
@@ -72,7 +82,7 @@ app.post("/api/db", upload.single("image"), async (req, res) => {
   console.log("File received:", req.file);
 
   const { name, description, price, stock, category, discount } = req.body;
-  const image = req.file ? `${process.env.BASE_URL}/api/db/${req.file.filename}` : null;
+  const image = req.file ? `${process.env.BASE_URL}/upload/${req.file.filename}` : null;
 
   if (!name || !price || stock === undefined) {
     return res.status(400).json({ message: "Please provide all required fields" });
@@ -103,33 +113,49 @@ app.put("/admin/products/:id", async (req, res) => {
   const { id } = req.params;
   const { name, description, price, category, image_url, discount } = req.body;
 
-  const query = "UPDATE products SET name = ?, description = ?, price = ?, category = ?, image_url = ?, discount = ? WHERE id = ?";
-  const values = [name, description, price, category, image_url || "", discount || 0.00, id];
+  const query = `
+    UPDATE Products
+    SET
+      name = COALESCE(?, name),
+      description = COALESCE(?, description),
+      price = COALESCE(?, price),
+      category = COALESCE(?, category),
+      image_url = COALESCE(?, image_url),
+      discount = COALESCE(?, discount)
+    WHERE id = ?`;
+  
+  const values = [name, description, price, category, image_url, discount, id];
 
   try {
-    await db.execute(query, values);
-    res.status(200).json({ message: "Product updated successfully" });
+    const [result] = await db.execute(query, values);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: "Product updated successfully" });
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
   } catch (err) {
-    res.status(500).json({ message: "Failed to update product" });
+    res.status(500).json({ message: "Failed to update product", error: err });
   }
 });
+
 
 // מחיקת מוצר
 app.delete("/admin/products/:id", async (req, res) => {
   const { id } = req.params;
-
-  if (!id) {
-    return res.status(400).json({ message: "Product ID is required" });
-  }
-
   const query = "DELETE FROM Products WHERE id = ?";
+
   try {
-    await db.execute(query, [id]);
-    res.status(200).json({ message: "Product deleted successfully" });
+    const [result] = await db.execute(query, [id]);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: `Product with ID ${id} deleted successfully` });
+    } else {
+      res.status(404).json({ message: "Product not found" });
+    }
   } catch (err) {
     res.status(500).json({ message: "Failed to delete product", error: err });
   }
 });
+
 
 // הצגת כל המוצרים
 app.get("/api/db", async (req, res) => {
@@ -167,10 +193,15 @@ app.post("/api/orders", async (req, res) => {
     return res.status(400).json({ message: "User ID and cart are required" });
   }
 
-  const query = "INSERT INTO Orders (user_id, total_price) VALUES (?, ?)";
   try {
-    const [result] = await db.execute(query, [user_id, total_price || 0]);
-    const orderId = result.insertId;
+    await db.beginTransaction(); // התחל Transaction
+
+    const [orderResult] = await db.execute(
+      "INSERT INTO Orders (user_id, total_price) VALUES (?, ?)",
+      [user_id, total_price || 0]
+    );
+
+    const orderId = orderResult.insertId;
 
     const itemsQuery =
       "INSERT INTO Order_Items (order_id, product_id, quantity, price) VALUES ?";
@@ -182,11 +213,15 @@ app.post("/api/orders", async (req, res) => {
     ]);
 
     await db.query(itemsQuery, [itemsValues]);
+
+    await db.commit(); // סיים את ה-Transaction
     res.status(200).json({ message: "Order placed successfully", orderId });
   } catch (err) {
+    await db.rollback(); // בטל את ה-Transaction במקרה של שגיאה
     res.status(500).json({ message: "Failed to create order", error: err });
   }
 });
+
 
 console.log("Database URL:", process.env.DATABASE_URL);
 console.log("BASE URL:", process.env.BASE_URL);

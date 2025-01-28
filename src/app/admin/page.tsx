@@ -17,28 +17,26 @@ const AdminPage = () => {
       setProductImage(e.target.files[0]);
     }
   };
+
   const handleAddProduct = async () => {
-    const formData = new FormData();
-    formData.append("name", productName);
-    formData.append("description", productDescription);
-    formData.append("price", String(productPrice));
-    formData.append("stock", String(productStock));
-    formData.append("category", productCategory);
-    formData.append("discount", String(productDiscount));
-
-    // אם יש תמונה, הוסף אותה ל-FormData
-    if (productImage) {
-      formData.append("image", productImage);
-    }
-
     try {
-      // שלח את כל הנתונים לשרת
+      const formData = new FormData();
+      formData.append("name", productName);
+      formData.append("description", productDescription);
+      formData.append("price", String(productPrice));
+      formData.append("stock", String(productStock));
+      formData.append("category", productCategory);
+      formData.append("discount", String(productDiscount));
+      if (productImage) {
+        formData.append("image", productImage); // העלאת התמונה אם קיימת
+      }
+
       const response = await axios.post(
-        "https://kezez-place.com/api/db",
+        "https://kezez-place.com/api/products", // שים לב לנתיב הנכון
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // הגדרת Content-Type כ-multipart/form-data
+            "Content-Type": "multipart/form-data", // הגדרת ה-Headers
           },
         }
       );
