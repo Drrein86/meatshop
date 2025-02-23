@@ -14,13 +14,17 @@ export const authOptions = {
     signIn: "/login", // עמוד התחברות מותאם אישית
   },
   callbacks: {
-    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      return url.startsWith(baseUrl) ? url : baseUrl; // מונע הפניות לא תקינות
+    async session({ session, token }: { session: any; token: any }) {
+      try {
+        // מבצע פעולות עם session ו-token
+        return session;
+      } catch (error) {
+        console.error("Error in session callback:", error);
+        return null; // במקרה של שגיאה מחזירים null או פעולה אחרת
+      }
     },
-    async session({ session, token }: { session: Session; token: any }) {
-      return session; // מונע בעיות עם הנתונים שמוחזרים
-    },
-  },
+  }
+ 
 };
 
 export default NextAuth(authOptions);
