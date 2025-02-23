@@ -11,7 +11,7 @@ const LoginPage = () => {
   }, [session]);
 
   if (status === "loading") {
-    return <div>טוען...</div>; // או לודר מותאם אישית
+    return <div>טוען....</div>; // או לודר מותאם אישית
   }
 
   return (
