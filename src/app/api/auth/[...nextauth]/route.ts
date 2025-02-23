@@ -10,7 +10,7 @@ const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login", // עמוד התחברות מותאם אישית
+    signIn: "/loginn", // עמוד התחברות מותאם אישית
   },
   callbacks: {
     async session({ session, token }: { session: any; token: any }) {
