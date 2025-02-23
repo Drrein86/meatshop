@@ -1,7 +1,13 @@
-import NextAuth from "next-auth";
+"use client";
+import { NextAuthOptions, User } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import GoogleProvider from "next-auth/providers/google";
 
-const authOptions = {
+interface ExtendedUser extends User {
+  id: string;
+}
+
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -9,11 +15,47 @@ const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  pages: {
-    signIn: "/login", // עמוד התחברות מותאם אישית
+  callbacks: {
+    async signIn({
+      user,
+      account,
+      profile,
+    }: {
+      user: ExtendedUser;
+      account: any;
+      profile?: any;
+    }): Promise<boolean> {
+      console.log("🔎 [SIGN IN CALLBACK]", user, account, profile);
+      return true;
+    },
+    async session({
+      session,
+      token,
+    }: {
+      session: any;
+      token: JWT;
+    }): Promise<any> {
+      console.log("🔎 [SESSION CALLBACK]", session, token);
+      
+      if (session.user) {
+        session.user.id = token.sub ?? ""; 
+      }
+      return session;
+    },
+    async jwt({
+      token,
+      user,
+    }: {
+      token: JWT;
+      user?: ExtendedUser;
+    }): Promise<JWT> {
+      console.log("🔎 [JWT CALLBACK]", token, user);
+      if (user) {
+        token.sub = user.id; 
+      }
+      return token;
+    },
   },
 };
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export default authOptions;
