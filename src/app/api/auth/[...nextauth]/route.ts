@@ -16,9 +16,14 @@ const authOptions = {
     async session({ session, token }: { session: any; token: any }) {
       console.log("Session:", session);
       console.log("Token:", token);
+  
+      // דוגמה להוספת מידע נוסף ל-session
+      session.user.id = token.id || session.user.id;
       return session;
     },
   }
+  
+  
 
 };
 
