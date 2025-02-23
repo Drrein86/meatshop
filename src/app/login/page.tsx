@@ -4,11 +4,16 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   useEffect(() => {
-    // אפשר להוסיף כאן לוגיקה שקשורה לטעינה של סשן
     console.log(session);
   }, [session]);
+
+  if (status === "loading") {
+    return <div>טוען...</div>; // או לודר מותאם אישית
+  }
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="text-center">
