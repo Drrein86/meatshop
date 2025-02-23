@@ -5,8 +5,11 @@ export default function MyComponent() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && status === "unauthenticated") {
-      signIn();
+    if (status === "unauthenticated") {
+      // בדיקה אם המשתמש כבר מנסה להיכנס כדי למנוע לולאה אינסופית
+      if (window.location.pathname !== "/api/auth/signin") {
+        signIn();
+      }
     }
   }, [status]);
 
