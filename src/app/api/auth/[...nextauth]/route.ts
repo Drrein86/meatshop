@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { Session } from "next-auth";
 
 export const authOptions = {
   providers: [
@@ -15,16 +14,11 @@ export const authOptions = {
   },
   callbacks: {
     async session({ session, token }: { session: any; token: any }) {
-      try {
-        // מבצע פעולות עם session ו-token
-        return session;
-      } catch (error) {
-        console.error("Error in session callback:", error);
-        return null; // במקרה של שגיאה מחזירים null או פעולה אחרת
-      }
+      return session;
     },
-  }
- 
+  },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
